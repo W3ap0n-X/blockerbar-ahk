@@ -26,19 +26,19 @@ Return
 		global BB_Setup_HWND := bbsetuphwnd
 		Gui, BlockerBarSetup:Color, % Format("{:s}", "000000")
 		Gui, BlockerBarSetup:Font , % "c" . Format("{:s}", "FFFFFF")
-		Gui, BlockerBarSetup:Add , Text, x5 y5, No Bound Window
-		Gui, BlockerBarSetup:Add , Button, x+5 gBB_SelectWindow, Bind Window
+		Gui, BlockerBarSetup:Add , Text, x5 y5 vBB_BoundWindow, No Bound Window
+		Gui, BlockerBarSetup:Add , Button, x5 y+5 gBB_SelectWindow, Bind Window
 		Gui, BlockerBarSetup:Add , Button, x+5 gBB_Confirm, Confirm
 
 		Gui, BlockerBarSetup:Add , Text, x5 y+5, XCoord:
-		Gui, BlockerBarSetup:Add , Text, x+5 w100 vBB_XCoord, -
-		Gui, BlockerBarSetup:Add , Text, x5 y+5, YCoord:
-		Gui, BlockerBarSetup:Add , Text, x+5 w100 vBB_YCoord, -
+		Gui, BlockerBarSetup:Add , Text, x+5 w60 vBB_XCoord, -
+		Gui, BlockerBarSetup:Add , Text, x+10, YCoord:
+		Gui, BlockerBarSetup:Add , Text, x+5 w60 vBB_YCoord, -
 
 		Gui, BlockerBarSetup:Add , Text, x5 y+5, XOffset:
-		Gui, BlockerBarSetup:Add , Text, x+5 w100 vBB_XOffset, -
-		Gui, BlockerBarSetup:Add , Text, x5 y+5, YOffset:
-		Gui, BlockerBarSetup:Add , Text, x+5 w100 vBB_YOffset, -
+		Gui, BlockerBarSetup:Add , Text, x+5 w60 vBB_XOffset, -
+		Gui, BlockerBarSetup:Add , Text, x+10, YOffset:
+		Gui, BlockerBarSetup:Add , Text, x+5 w60 vBB_YOffset, -
 		Gui, BlockerBarSetup:Show, w200 h100
 	} Else {
 		Goto, BB_UnConfirm
@@ -49,7 +49,7 @@ BB_Confirm:
 	BB_POS := BB_Win_GetPos("ahk_id " . BB_Setup_HWND)
 	BB_LIVE_FLAG := 1
 	Gui, BlockerBarSetup: -Caption -Border -SysMenu +Disabled -Resize
-	Gui, BlockerBarSetup:Show, % "w" . (BB_POS["Width"] + 6) . "h" . (BB_POS["Height"] + 29)
+	Gui, BlockerBarSetup:Show, % "w" . (BB_POS["Width"]) . "h" . (BB_POS["Height"] )
 	WinSet, Transparent, 255, % "ahk_id " . BB_Setup_HWND
 	WinSet, ExStyle, +0x20, % "ahk_id " . BB_Setup_HWND
 	WinSet, AlwaysOnTop, On, % "ahk_id " . BB_Setup_HWND
@@ -61,11 +61,12 @@ BB_UnConfirm:
 	BB_POS := BB_Win_GetPos("ahk_id " . BB_Setup_HWND)
 	BB_LIVE_FLAG := 0
 	Gui, BlockerBarSetup: +Caption +Border +SysMenu -Disabled +Resize
-	Gui, BlockerBarSetup:Show, % "w" . ( BB_POS["Width"] ) . "h" . ( BB_POS["Height"] )
+	Gui, BlockerBarSetup:Show, % "w" . ( BB_POS["Width"] -6  ) . "h" . ( BB_POS["Height"] - 29 )
 	WinSet, Transparent, 255, % "ahk_id " . BB_Setup_HWND
 	WinSet, ExStyle, -0x20, % "ahk_id " . BB_Setup_HWND
 	WinSet, AlwaysOnTop, Off, % "ahk_id " . BB_Setup_HWND
-	BB_BoundWindow_ID := ""
+	BB_BoundWindow_ID := "No Bound Window"
+	GuiControl, , BB_BoundWindow , % BB_BoundWindow_ID
 	BB_Win_Move(true)
 Return
 
@@ -88,12 +89,13 @@ BB_SelectWindow:
 	BB_Move(Active_Win_Array["x"], Active_Win_Array["y"])
 	WinActivate , ahk_id %BB_Setup_HWND%
 	BB_POS := BB_Win_GetPos("ahk_id " . BB_Setup_HWND)
-	GuiControl, , BB_XCoord , % Active_Win_Array["x"]
+	GuiControl, , BB_BoundWindow , % Active_Win_Array["ID"]
 	GuiControl, , BB_XCoord , % Active_Win_Array["x"]
 	GuiControl, , BB_YCoord , % Active_Win_Array["y"]
 	GuiControl, , BB_XOffset , % BB_POS["X"] - Active_Win_Array["x"]
 	GuiControl, , BB_YOffset , % BB_POS["Y"] - Active_Win_Array["y"]
 	global BB_BoundWindow_ID := Active_Win_Array["ID"]
+	BB_BAR_MOVE()
 	OnMessage(0x0003 , "BB_BAR_MOVE")
 Return
 
